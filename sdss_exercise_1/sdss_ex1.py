@@ -16,7 +16,7 @@ fits_images = [fits.getdata(fitsfile) for fitsfile in fits_files]
 other_images = [Image.open(other) for other in others]
 
 for i in range(len(fits_images)):
-    fig, (ax1, ax2) = plt.subplots(ncols=2)
+    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8,4))
     ax1.imshow(fits_images[i])
     ax2.imshow(other_images[i])
     fig.suptitle(fits_files[i].replace('.fits', ''))
