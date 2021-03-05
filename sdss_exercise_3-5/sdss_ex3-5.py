@@ -21,8 +21,8 @@ plt.style.use('ggplot')
 x_data = np.array(['ug', 'gr', 'ri', 'iz'], dtype=str).reshape((2, 2))
 fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8), sharey=True)
 for i, j in itertools.product(range(2), range(2)):
-    data.plot(x=x_data[i, j], y='z', kind='scatter', ax=axes[i, j], logy=True, xlabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]),
-              ylabel='Redshift')
+    data.plot(x=x_data[i, j], y='z', kind='scatter', ax=axes[i, j], xlabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]),
+              ylabel='Redshift', xlim=(-0.5, 5))
 fig.suptitle('Quasar Color-Redshift Diagrams')
 plt.savefig('quasar-color-redshift.png', dpi=300)
 plt.close()
@@ -63,7 +63,7 @@ def make_density_plot(norm, label: str = None, **kwargs):
             ymin = ylim[0]
             ymax = ylim[1]
         axes[i, j].set_ylim(ymin, ymax)
-        axes[i, j].set_yscale('log')
+        # axes[i, j].set_yscale('log')
 
         # Create meshgrid
         xx, yy = np.mgrid[xmin:xmax:100j, ymin:ymax:100j]
