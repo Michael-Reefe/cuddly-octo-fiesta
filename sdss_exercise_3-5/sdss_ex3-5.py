@@ -21,8 +21,8 @@ plt.style.use('ggplot')
 x_data = np.array(['ug', 'gr', 'ri', 'iz'], dtype=str).reshape((2, 2))
 fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8), sharey=True)
 for i, j in itertools.product(range(2), range(2)):
-    data.plot(x=x_data[i, j], y='z', kind='scatter', ax=axes[i, j], xlabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]),
-              ylabel='Redshift', xlim=(-0.5, 5))
+    data.plot(x='z', y=x_data[i, j], kind='scatter', fmt=',', ax=axes[i, j], xlabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]),
+              ylabel='Redshift')
 fig.suptitle('Quasar Color-Redshift Diagrams')
 plt.savefig('quasar-color-redshift.png', dpi=300)
 plt.close()
@@ -93,8 +93,8 @@ def make_density_plot(norm, label: str = None, **kwargs):
     plt.close()
 
 
-make_density_plot(norm=colors.Normalize(vmin=0, vmax=1.6), label='Linear Scaling', xlim=(-0.5, 1.0), ylim=(1e-01, 3))
-make_density_plot(norm=colors.LogNorm(), label='Logarithmic Scaling')
+# make_density_plot(norm=colors.Normalize(vmin=0, vmax=1.6), label='Linear Scaling', xlim=(-0.5, 1.0), ylim=(1e-01, 3))
+# make_density_plot(norm=colors.LogNorm(), label='Logarithmic Scaling')
 
 
 # Color-color diagrams for Exercise 5
