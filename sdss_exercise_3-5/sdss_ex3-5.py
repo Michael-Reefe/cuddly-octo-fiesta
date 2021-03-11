@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib import pyplot as plt, contour as contour, colors as colors
 import itertools
 from typing import Union, Optional, Tuple, List
-
-data = pd.read_csv('query_result.csv', delimiter=',', header=0)
+prefix = 'experiment-'
+data = pd.read_csv('result (10).csv', delimiter=',', header=0)
 data['ug'] = data['modelmag_u'] - data['modelmag_g']
 data['gr'] = data['modelmag_g'] - data['modelmag_r']
 data['ri'] = data['modelmag_r'] - data['modelmag_i']
@@ -22,9 +22,9 @@ x_data = np.array(['ug', 'gr', 'ri', 'iz'], dtype=str).reshape((2, 2))
 fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8), sharey=True)
 for i, j in itertools.product(range(2), range(2)):
     data.plot(x=x_data[i, j], y='z', kind='scatter', ax=axes[i, j], xlabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]),
-              ylabel='Redshift', xlim=(-0.5, 5))
+              ylabel='Redshift', xlim=(-5, 10))
 fig.suptitle('Quasar Color-Redshift Diagrams')
-plt.savefig('quasar-color-redshift.png', dpi=300)
+plt.savefig(prefix + 'quasar-color-redshift.png', dpi=300)
 plt.close()
 
 
@@ -93,14 +93,17 @@ def make_density_plot(norm, label: str = None, **kwargs):
     plt.close()
 
 
-make_density_plot(norm=colors.Normalize(vmin=0, vmax=1.6), label='Linear Scaling', xlim=(-0.5, 1.0), ylim=(1e-01, 3))
-make_density_plot(norm=colors.LogNorm(), label='Logarithmic Scaling')
+#make_density_plot(norm=colors.Normalize(vmin=0, vmax=1.6), label='Linear Scaling', xlim=(-0.5, 1.0), ylim=(1e-01, 3))
+#make_density_plot(norm=colors.LogNorm(), label='Logarithmic Scaling')
 
 
 # Color-color diagrams for Exercise 5
 def plot_color_color(xcolor: str, ycolor: str, axis):
     assert xcolor in ('ug', 'gr', 'ri', 'iz') and ycolor in ('ug', 'gr', 'ri', 'iz')
-    scatterplot = axis.scatter(data[xcolor], data[ycolor], c=data['z'], cmap='coolwarm', norm=colors.Normalize(vmin=np.nanmin(data['z']), vmax=np.nanmax(data['z'])))
+    trimmed = np.where((data[xcolor] < 12) & (data[ycolor] < 12))[0]
+    datax = data[xcolor][trimmed]
+    datay = data[ycolor][trimmed]
+    scatterplot = axis.scatter(datax, datay, c=data['z'][trimmed], cmap='coolwarm', norm=colors.Normalize(vmin=np.nanmin(data['z']), vmax=np.nanmax(data['z'])))
     axis.set_xlabel('$%s$ [mag]' % (xcolor[0] + ' - ' + xcolor[1]))
     axis.set_ylabel('$%s$ [mag]' % (ycolor[0] + ' - ' + ycolor[1]))
     return scatterplot
@@ -115,5 +118,5 @@ pos1 = ax[2].get_position()
 cbar_ax = fig.add_axes([0.92, pos1.y0, 0.012, pos1.height])
 fig.colorbar(sp3, cbar_ax, label='Redshift ($z$)')
 fig.suptitle('Quasar Color-Color Diagrams')
-plt.savefig('quasar-color-color.png', dpi=300, bbox_inches='tight')
+plt.savefig(prefix + 'quasar-color-color.png', dpi=300, bbox_inches='tight')
 plt.close()
