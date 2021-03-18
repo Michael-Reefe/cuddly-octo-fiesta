@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy import optimize as opt
 from matplotlib import pyplot as plt
 from typing import Union, Optional, List, Tuple
 
@@ -36,6 +37,10 @@ def sexagesimal(degrees: Union[float, int]) -> Tuple[int, int, float]:
     return hh, mm, ss
 
 
+def line(x, a, b):
+    return a*x + b
+
+
 vopt['ra'] = pd.Series([tuple(sexagesimal(ra)) for ra in vopt['radeg']], name='ra')
 a40['ra'] = pd.Series([tuple(sexagesimal(ra)) for ra in a40['radeg']], name='ra')
 
@@ -55,3 +60,31 @@ ax.set_xlabel('Right ascension ($\\alpha$, J2000)')
 ax.set_ylabel('Declination ($\\delta$, J2000)')
 ax.set_title('Sky Distribution of Galaxies in the Virgo Cluster')
 plt.savefig('skydist.png', dpi=300)
+plt.close()
+
+popt1, pcov1 = opt.curve_fit(line, vopt['sepmin'], vopt['vhel'])
+popt2, pcov2 = opt.curve_fit(line, a40['sepmin'], a40['vhel'])
+fit_x = np.linspace(np.nanmin(vopt['sepmin']), np.nanmax(vopt['sepmin']))
+fit_y1 = popt1[0]*fit_x + popt1[1]
+fit_y2 = popt2[0]*fit_x + popt2[1]
+
+fig, ax = plt.subplots()
+ax.scatter(vopt['sepmin'], vopt['vhel'], c='r', label='optical', s=1)
+ax.scatter(a40['sepmin'], a40['vhel'], c='b', label='$\\alpha .40$', s=1)
+ax.plot(fit_x, fit_y1, 'r--', label='Linear fits')
+ax.plot(fit_x, fit_y2, 'b--')
+ax.set_xlabel('Separation from center [arcmin]')
+ax.set_ylabel('Heliocentric Radial Velocity [km s$^{-1}$]')
+ax.set_title('Slopes: %.3f [optical]; %.3f [$\\alpha .40$] km s$^{-1}$ arcmin$^{-1}$' % (popt1[0], popt2[0]))
+ax.legend()
+plt.savefig('vheldist.png', dpi=300)
+plt.close()
+
+fig, ax = plt.subplots()
+ax.hist(vopt['vhel'], bins=100, label='optical', color='r')
+ax.hist(a40['vhel'], bins=100, label='$\\alpha .40$', color='b')
+ax.set_xlabel('Heliocentric Radial Velocity [km s$^{-1}$]')
+ax.set_ylabel('Number in bin')
+ax.legend()
+plt.savefig('vhelhist.png', dpi=300)
+plt.close()
