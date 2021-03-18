@@ -19,10 +19,11 @@ data['iz'] = data['modelmag_i'] - data['modelmag_z']
 # Scatterplots
 plt.style.use('ggplot')
 x_data = np.array(['ug', 'gr', 'ri', 'iz'], dtype=str).reshape((2, 2))
-fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8), sharey=True)
+fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(8, 8), sharex=True)
 for i, j in itertools.product(range(2), range(2)):
-    data.plot(x='z', y=x_data[i, j], kind='scatter', fmt=',', ax=axes[i, j], xlabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]),
-              ylabel='Redshift')
+    data.plot(x='z', y=x_data[i, j], kind='scatter', s=1, ax=axes[i, j], xlabel='Redshift',
+              ylabel='$%s$ [mag]' % (x_data[i, j][0] + ' - ' + x_data[i, j][1]), ylim=(-0.5, 1))
+fig.subplots_adjust(wspace=0.3)
 fig.suptitle('Quasar Color-Redshift Diagrams')
 plt.savefig('quasar-color-redshift.png', dpi=300)
 plt.close()
@@ -100,7 +101,7 @@ def make_density_plot(norm, label: str = None, **kwargs):
 # Color-color diagrams for Exercise 5
 def plot_color_color(xcolor: str, ycolor: str, axis):
     assert xcolor in ('ug', 'gr', 'ri', 'iz') and ycolor in ('ug', 'gr', 'ri', 'iz')
-    scatterplot = axis.scatter(data[xcolor], data[ycolor], c=data['z'], cmap='coolwarm', norm=colors.Normalize(vmin=np.nanmin(data['z']), vmax=np.nanmax(data['z'])))
+    scatterplot = axis.scatter(data[xcolor], data[ycolor], c=data['z'], s=8, cmap='coolwarm', norm=colors.Normalize(vmin=np.nanmin(data['z']), vmax=np.nanmax(data['z'])))
     axis.set_xlabel('$%s$ [mag]' % (xcolor[0] + ' - ' + xcolor[1]))
     axis.set_ylabel('$%s$ [mag]' % (ycolor[0] + ' - ' + ycolor[1]))
     return scatterplot
