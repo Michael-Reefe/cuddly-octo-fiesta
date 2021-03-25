@@ -10,48 +10,119 @@ import pandas as pd
 from scipy import optimize as opt
 from matplotlib import pyplot as plt
 from typing import Union, Optional, List, Tuple
+def line(x, a, b):
+    return a*x + b
 
 Virgo = pd.read_csv('virgo7.5deg.opthi.csv')
 notVirgo = pd.read_csv('notVirgo7.5deg.opthi.csv')
 
-
+Vra = Virgo['radeg']
+Vdec = Virgo['decdeg']
 
 
 VL = Virgo['logL_V']
-Vgf = Virgo['logMH']
 NL = notVirgo['logL_V']
+
+Vgf = Virgo['logMH']
 Ngf = notVirgo['logMH']
 
+Vi = Virgo['logL_i']
+Ni = notVirgo['logL_i']
+
+Vgas2_i = Virgo['gas2L_i']
+Ngas2_i = notVirgo['gas2L_i']
 
 
-fig, ax = plt.subplots()
+
+
+Vgas2_l = Virgo['gas2L_V'] 
+Ngas2_l = notVirgo['gas2L_V'] 
+
+
+fig, ax = plt.subplots(dpi = 600)
 ax.scatter(VL,Vgf , c='r', s=1, label='Virgo')
 ax.scatter(NL,Ngf, c='b', s=1, label='Not Virgo')
-#ax.plot([11.875, 13], [16, 16], 'k--', lw=0.5, label='$\\alpha .40$ cutoff')
-#ax.set_xticks(np.linspace(13, 11.875, 10))
-#ax.set_xlim(13, 11.875)
+ax.set_xlabel('log V-band Luminosity')
+ax.set_ylabel('Log Mass of HI')
+ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo')
+
+popt1, pcov1 = opt.curve_fit(line, VL,Vgf )
+popt2, pcov2 = opt.curve_fit(line, NL,Ngf )
+fit_x = np.linspace(np.nanmin(NL), np.nanmax(NL))
+fit_y1 = popt1[0]*fit_x + popt1[1]
+fit_y2 = popt2[0]*fit_x + popt2[1]
+
+ax.plot(fit_x, fit_y1, 'r--', label='Linear fits')
+ax.plot(fit_x, fit_y2, 'b--')
 ax.legend()
-#ax.set_xticklabels(['$13^\\mathrm{h}$', '', '$12^\\mathrm{h}45^\\mathrm{m}$', '', '$12^\\mathrm{h}30^\\mathrm{m}$', '',
-#                    '$12^\\mathrm{h}15^\\mathrm{m}$', '', '$12^\\mathrm{h}$', ''])
-#yt = np.arange(6, 22, 2)
-#ax.set_yticks(yt)
-#ax.set_yticklabels(['$%d\\degree$' % yti for yti in yt])
+
+
+
+fig, ax = plt.subplots(dpi = 600)
+ax.scatter(VL,Vgas2_l , c='r', s=1, label='Virgo')
+ax.scatter(NL,Ngas2_l, c='b', s=1, label='Not Virgo')
+ax.set_xlabel('log V-band Luminosity')
+ax.set_ylabel('Log gas fraction')
+ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo')
+
+
+popt1, pcov1 = opt.curve_fit(line, VL,Vgas2_l)
+popt2, pcov2 = opt.curve_fit(line, NL,Ngas2_l)
+
+fit_x = np.linspace(np.nanmin(NL), np.nanmax(NL))
+fit_y1 = popt1[0]*fit_x + popt1[1]
+fit_y2 = popt2[0]*fit_x + popt2[1]
+ax.plot(fit_x, fit_y1, 'r--', label='Linear fits')
+ax.plot(fit_x, fit_y2, 'b--')
+ax.legend()
+
+
+fig, ax = plt.subplots(dpi = 600)
+ax.hist( [Vgas2_l,Ngas2_l] , bins=30, label=['Virgo','Not Virgo'], color=['r','b'],density = True)
+ax.set_xlabel('Log of Gas fraction')
+ax.set_ylabel('Probablity Density')
+ax.legend()
+ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo (V-Band)')
+
+fig, ax = plt.subplots(dpi = 600)
+ax.hist( [Vgas2_i,Ngas2_i] , bins=30, label=['Virgo','Not Virgo'], color=['r','b'],density = True)
+ax.set_xlabel('Log of Gas fraction')
+ax.set_ylabel('Probablity Density')
+ax.legend()
+ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo (I-band)')
+
+
+'''
+from matplotlib import pyplot as plt, contour as contour, colors as colors
+fig, ax = plt.subplots(dpi = 600)
+ax.scatter(Vra, Vdec, c=VL, s=1, cmap='coolwarm', norm=colors.Normalize(vmin=np.nanmin(VL), vmax=np.nanmax(VL)))
+#axis.set_xlabel('$%s$ [mag]' % (xcolor[0] + ' - ' + xcolor[1]))
+#axis.set_ylabel('$%s$ [mag]' % (ycolor[0] + ' - ' + ycolor[1]))
+
+
+fig, ax = plt.subplots(dpi = 600)
+ax.scatter(Vi,Vgf , c='r', s=1, label='Virgo')
+ax.scatter(Ni,Ngf, c='b', s=1, label='Not Virgo')
 ax.set_xlabel('log V-band Luminosity')
 ax.set_ylabel('Log Mass of HI')
 ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo')
 
 
-fig, ax = plt.subplots()
 
-ax.hist(Vgf, bins=100, label='Virgo', color='r',density = True)
-ax.hist(Ngf, bins=100, label='Not Virgo', color='b',density = True)
-
-ax.set_xlabel('Gas fraction')
-ax.set_ylabel('Probablity Density')
-ax.legend()
-
+fig, ax = plt.subplots(dpi = 600)
+ax.scatter(Vgas2_l, Vgf , c='r', s=1, label='Virgo')
+ax.scatter(Ngas2_l, Ngf, c='b', s=1, label='Not Virgo')
+ax.set_xlabel('gas fraction')
+ax.set_ylabel('mass of hydrogen')
+ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo')
 
 
 
+fig, ax = plt.subplots(dpi = 600)
+ax.scatter(VL,Vgas2_i , c='r', s=1, label='Virgo')
+ax.scatter(NL,Ngas2_i, c='b', s=1, label='Not Virgo')
+ax.set_xlabel('log V-band Luminosity')
+ax.set_ylabel('Log gas fraction')
+ax.set_title('The properties of local α.40 galaxies in Virgo and outside Virgo')
 
-
+'''
